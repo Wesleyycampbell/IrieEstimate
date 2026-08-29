@@ -43,10 +43,107 @@ interface EstimateResult {
   totalCost: number;
 }
 
-type Step = "tier" | "customize" | "contact" | "results";
+interface BedroomConfig {
+  id: string;
+  label: string;
+  description: string;
+  minSqFt: number;
+  maxSqFt: number;
+  defaultSqFt: number;
+}
+
+const BEDROOM_CONFIGS: BedroomConfig[] = [
+  {
+    id: "studio",
+    label: "Studio / 1 Bedroom",
+    description: "Smaller unit, studio or 1-bedroom apartment",
+    minSqFt: 350,
+    maxSqFt: 600,
+    defaultSqFt: 450,
+  },
+  {
+    id: "2bed",
+    label: "2 Bedroom",
+    description: "Living/dining area, kitchen, 1 bathroom",
+    minSqFt: 900,
+    maxSqFt: 1200,
+    defaultSqFt: 1000,
+  },
+  {
+    id: "3bed",
+    label: "3 Bedroom",
+    description: "2–3 bathrooms, living/dining/kitchen, verandah or carport",
+    minSqFt: 1000,
+    maxSqFt: 1500,
+    defaultSqFt: 1200,
+  },
+  {
+    id: "4bed",
+    label: "4+ Bedroom",
+    description: "Larger family home, multiple bathrooms, extended living areas",
+    minSqFt: 1500,
+    maxSqFt: 3000,
+    defaultSqFt: 2000,
+  },
+];
+
+type Step = "bedrooms" | "tier" | "customize" | "contact" | "terms" | "results";
+
+const OPTION_TOOLTIPS: Record<string, string> = {
+  "Lineout & Excavation (basic)": "Setting out the building lines and digging trenches for the foundation. Basic standard option.",
+  "Strip Foundation + Steelwork": "Continuous strip footing with steel reinforcement bars, formwork, and concrete pour.",
+  "Raft Foundation (cast premix)": "Full slab foundation poured across the entire footprint using premixed concrete.",
+  "Pile Foundation (hilly terrain)": "Deep concrete piles drilled into hillside or unstable ground to anchor the structure.",
+  "6-inch Block (standard)": "Standard 6-inch concrete block walls with mortar. Basic standard option.",
+  "6-inch Block (reinforced + columns)": "6-inch block walls with poured concrete columns at intervals for added strength.",
+  "8-inch Block (two-storey)": "Heavier 8-inch blocks required for two-storey structures to bear upper floor loads.",
+  "Concrete Frame + Infill Block": "Poured concrete frame (columns + beams) with block walls filled between them.",
+  "Stairs (per step - formwork/steel/cast)": "Per step: formwork construction, steel reinforcement, and concrete casting.",
+  "Zinc Sheet (framing only - no sarking)": "Timber or steel roof framing with zinc sheeting nailed directly. Basic standard option.",
+  "Zinc + Sarking": "Roof framing with sarking board underlayment before zinc sheeting for better insulation.",
+  "Shingle Roof": "Asphalt or fibre-cement shingles on plywood decking with waterproof membrane.",
+  "Concrete Roof Deck (formwork + cast)": "Flat or sloped concrete roof: formwork, steel mesh, and concrete pour.",
+  "Arise ($600/ft run)": "Raised parapet walls or decorative arise around the roof edge, priced per linear foot.",
+  "Rough Render (wall & ceiling)": "Basic cement-sand render (scratch coat) on walls and ceilings. Basic standard option.",
+  "Smooth Render + Float Off": "Two-coat render finished with a wooden or sponge float for a smooth surface.",
+  "Surecote / Textured Finish": "Proprietary textured wall coating applied over render for a decorative finish.",
+  "Plaster Ceiling ($35K per 100sqft)": "Traditional wet plaster ceiling on metal lath, finished smooth.",
+  "Drywall Ceiling ($300/sqft + tape)": "Gypsum board ceiling on metal furring, taped, jointed, and sanded smooth.",
+  "Standard Ceramic Tiles ($350/sqft)": "Floor tiling with standard ceramic tiles including adhesive and grouting. Basic standard option.",
+  "Porcelain Tiles": "Porcelain tile installation — harder material requiring notched trowel and precise cutting.",
+  "Wall Tiling ($450/sqft)": "Ceramic or porcelain tiles installed on walls (kitchen splash-back, bathroom walls).",
+  "Stone Pavers ($450/sqft install)": "Natural or manufactured stone pavers laid on a sand or mortar bed.",
+  "Floor Prep - Shingle/BRC/Cast ($500/sqft)": "Sub-floor preparation: shingle fill, BRC mesh, and concrete screed before tiling.",
+  "Standard Doors + Louver Windows": "Basic solid-core doors and aluminium louvre windows. Basic standard option.",
+  "Panel Doors + Sliding Windows": "Upgraded panel doors and aluminium sliding windows with screens.",
+  "French Doors + French Windows ($6K ea.)": "Double-leaf French doors and casement-style French windows, per opening.",
+  "Hurricane-Rated Impact (full house)": "Impact-resistant windows and reinforced doors rated for Category 3+ hurricanes.",
+  "Basic Kitchen (countertop $4K/ft)": "Simple counter and sink installation with basic plumbing connections. Basic standard option.",
+  "Standard Kitchen + Cabinetry": "Pre-fabricated cabinets, countertop installation, and full plumbing fit-out.",
+  "Custom Cabinetry + Granite Countertop": "Custom-built wooden cabinets with natural granite or quartz countertops.",
+  "Standard Bathroom (shower stall $10K)": "Shower stall, toilet, and wash basin installation with basic tiling.",
+  "Full Bathroom (complete fit-out)": "Full bathroom: bathtub or walk-in shower, vanity, toilet, full wall and floor tiling.",
+  "Premium Bathroom (w/ Jacuzzi)": "Luxury bathroom with jacuzzi tub, rain shower, premium fixtures and full tiling.",
+  "Basic (PVC piping + soakaway)": "PVC waste pipes and a simple soakaway pit for drainage.",
+  "Septic Tank - Block-Up ($350K)": "Block-built septic tank with internal baffles and sealed render.",
+  "Septic + Soakaway ($550K)": "Septic tank plus a constructed soakaway field for effluent dispersal.",
+  "Full System (septic + reed bed + manholes)": "Complete sewage system: septic tank, reed bed filtration, inspection manholes.",
+  "Basic Wiring (10 points)": "10 electrical points (outlets + lights) with consumer unit and earth rod.",
+  "Standard Wiring (20 points)": "20 electrical points with breaker panel, earth rod, and outdoor lights.",
+  "Full Wiring (30 points + extras)": "30 points plus ceiling fans, outdoor outlets, and dedicated appliance circuits.",
+  "Premium (40+ points + panel upgrade)": "40+ points, upgraded panel, generator transfer switch, smart wiring provisions.",
+  "Basic Paint ($120/sqft - 1 coat)": "One coat of emulsion paint on rendered walls and ceilings.",
+  "Standard Paint ($120/sqft - 2 coats)": "Two coats of emulsion paint for better coverage and finish.",
+  "Premium Paint (2 coats + primer)": "Primer coat plus two finish coats of premium emulsion for full coverage.",
+  "No Painting (shell finish)": "Walls left as rendered — no painting. Suitable for shell-only handover.",
+  "No Contingency (0%)": "No buffer added. Final cost equals the sum of all line items.",
+  "Minimal (10%)": "10% contingency buffer for minor unexpected costs during the build.",
+  "Recommended (15%)": "15% contingency — the industry-standard buffer for residential construction.",
+  "Conservative (20%)": "20% contingency for builds with higher uncertainty or complex sites.",
+};
 
 export default function EstimatePage() {
-  const [step, setStep] = useState<Step>("tier");
+  const [step, setStep] = useState<Step>("bedrooms");
   const [houseTypes, setHouseTypes] = useState<HouseType[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [parishesList, setParishesList] = useState<Parish[]>([]);
@@ -56,6 +153,7 @@ export default function EstimatePage() {
   const CATS_PER_PAGE = 3;
 
   // Form state
+  const [selectedBedroom, setSelectedBedroom] = useState<string>("");
   const [selectedTier, setSelectedTier] = useState<string>("");
   const [selectedOptions, setSelectedOptions] = useState<Record<string, string>>({});
   const [sqft, setSqft] = useState<number>(1200);
@@ -176,12 +274,14 @@ export default function EstimatePage() {
     );
   }
 
-  const stepIndex = step === "tier" ? 0 : step === "customize" ? 1 : step === "contact" ? 2 : 3;
+  const stepIndex = step === "bedrooms" ? 0 : step === "tier" ? 1 : step === "customize" ? 2 : step === "contact" ? 3 : step === "terms" ? 4 : 5;
   const steps = [
-    { label: "Tier", done: stepIndex > 0 },
-    { label: "Finishes", done: stepIndex > 1 },
-    { label: "Details", done: stepIndex > 2 },
-    { label: "Results", done: stepIndex > 3 },
+    { label: "Size", done: stepIndex > 0 },
+    { label: "Tier", done: stepIndex > 1 },
+    { label: "Finishes", done: stepIndex > 2 },
+    { label: "Details", done: stepIndex > 3 },
+    { label: "Terms", done: stepIndex > 4 },
+    { label: "Results", done: stepIndex > 5 },
   ];
 
   return (
@@ -197,10 +297,12 @@ export default function EstimatePage() {
           {step !== "results" && (
             <button
               onClick={() => {
-                if (step === "customize") setStep("tier");
+                if (step === "tier") setStep("bedrooms");
+                else if (step === "customize") setStep("tier");
                 else if (step === "contact") setStep("customize");
+                else if (step === "terms") setStep("contact");
               }}
-              className={`text-sm text-ink-400 hover:text-ink-600 transition ${step === "tier" ? "invisible" : ""}`}
+              className={`text-sm text-ink-400 hover:text-ink-600 transition ${step === "bedrooms" ? "invisible" : ""}`}
             >
               Back
             </button>
@@ -243,7 +345,49 @@ export default function EstimatePage() {
       </div>
 
       <main className="max-w-3xl mx-auto px-4 sm:px-6 py-6 flex-1">
-        {/* STEP 1: TIER */}
+        {/* STEP 1: BEDROOMS */}
+        {step === "bedrooms" && (
+          <section>
+            <h1 className="text-2xl sm:text-3xl font-bold mb-2">How many bedrooms?</h1>
+            <p className="text-ink-400 mb-8">
+              This sets the typical square footage range for your build.
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {BEDROOM_CONFIGS.map((bc) => (
+                <button
+                  key={bc.id}
+                  onClick={() => {
+                    setSelectedBedroom(bc.id);
+                    setSqft(bc.defaultSqFt);
+                  }}
+                  className={`text-left p-6 rounded-lg border-2 transition ${
+                    selectedBedroom === bc.id
+                      ? "border-ink-800 bg-ink-50"
+                      : "border-ink-200/70 bg-white hover:border-ink-300"
+                  }`}
+                >
+                  <h3 className="font-bold text-lg mb-1">{bc.label}</h3>
+                  <p className="text-ink-400 text-sm mb-3">{bc.description}</p>
+                  <div className="text-ink-800 font-bold text-sm">
+                    {bc.minSqFt.toLocaleString()} – {bc.maxSqFt.toLocaleString()}
+                    <span className="text-xs text-ink-300 font-normal ml-1">sq ft typical</span>
+                  </div>
+                </button>
+              ))}
+            </div>
+            <div className="flex justify-end mt-8">
+              <button
+                disabled={!selectedBedroom}
+                onClick={() => setStep("tier")}
+                className="px-8 py-3 rounded-lg font-bold bg-ink-800 text-cane-400 hover:bg-ink-900 transition disabled:opacity-30 disabled:cursor-not-allowed text-sm"
+              >
+                Continue
+              </button>
+            </div>
+          </section>
+        )}
+
+        {/* STEP 2: TIER */}
         {step === "tier" && (
           <section>
             <h1 className="text-2xl sm:text-3xl font-bold mb-2">Choose your house type</h1>
@@ -282,16 +426,17 @@ export default function EstimatePage() {
           </section>
         )}
 
-        {/* STEP 2: CUSTOMIZE */}
+        {/* STEP 3: CUSTOMIZE */}
         {step === "customize" && (() => {
           const totalPages = Math.ceil(categories.length / CATS_PER_PAGE);
           const pageCats = categories.slice(catPage * CATS_PER_PAGE, (catPage + 1) * CATS_PER_PAGE);
           const isLastPage = catPage >= totalPages - 1;
+          const bedroomSqFt = BEDROOM_CONFIGS.find((c) => c.id === selectedBedroom)?.defaultSqFt ?? sqft;
           return (
             <section>
               <h1 className="text-2xl sm:text-3xl font-bold mb-2">Customise your finishes</h1>
               <p className="text-ink-400 mb-8">
-                Select one option from each category.
+                Select one option from each category. Tap any option to see what it includes.
                 <span className="ml-2 text-xs text-ink-300 font-medium">
                   Page {catPage + 1} of {totalPages}
                 </span>
@@ -300,28 +445,54 @@ export default function EstimatePage() {
                 {pageCats.map((cat) => (
                   <div key={cat.id} className="bg-white rounded-lg border border-ink-200/70 p-5 sm:p-6">
                     <h3 className="font-bold text-sm mb-4">{cat.name}</h3>
-                    <div className="flex flex-wrap gap-2">
-                      {cat.options.map((opt) => (
-                        <button
-                          key={opt.id}
-                          onClick={() => selectOption(cat.id, opt.id)}
-                          className={`px-4 py-2 rounded-lg text-sm font-medium border-2 transition ${
-                            selectedOptions[cat.id] === opt.id
-                              ? "border-ink-800 bg-ink-50 text-ink-800"
-                              : "border-ink-200/70 text-ink-500 hover:border-ink-300"
-                          }`}
-                        >
-                          {opt.name}
-                          {Number(opt.costModifier) > 0 && (
-                            <span className="ml-1.5 text-xs text-ink-300">
-                              +{opt.modifierType === "percentage"
-                                ? `${opt.costModifier}%`
-                                : `$${Number(opt.costModifier).toLocaleString()}`}
-                              {opt.modifierType === "per_sq_ft" && "/sqft"}
-                            </span>
-                          )}
-                        </button>
-                      ))}
+                    <div className="space-y-2">
+                      {cat.options.map((opt) => {
+                        const isSelected = selectedOptions[cat.id] === opt.id;
+                        const modifier = Number(opt.costModifier);
+                        const tooltip = OPTION_TOOLTIPS[opt.name];
+                        const labourCost = opt.modifierType === "per_sq_ft"
+                          ? modifier * bedroomSqFt
+                          : opt.modifierType === "percentage"
+                            ? null
+                            : modifier;
+                        return (
+                          <button
+                            key={opt.id}
+                            onClick={() => selectOption(cat.id, opt.id)}
+                            className={`w-full text-left p-3 sm:p-4 rounded-lg border-2 transition ${
+                              isSelected
+                                ? "border-ink-800 bg-ink-50"
+                                : "border-ink-200/70 hover:border-ink-300"
+                            }`}
+                          >
+                            <div className="flex items-start justify-between gap-3">
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center gap-2">
+                                  <span className={`text-sm font-medium ${isSelected ? "text-ink-800" : "text-ink-600"}`}>
+                                    {opt.name}
+                                  </span>
+                                </div>
+                                {tooltip && (
+                                  <p className="text-xs text-ink-400 mt-1 leading-relaxed">{tooltip}</p>
+                                )}
+                              </div>
+                              <div className="text-right shrink-0">
+                                <div className={`text-sm font-bold tabular-nums ${isSelected ? "text-ink-800" : "text-ink-500"}`}>
+                                  {opt.modifierType === "percentage"
+                                    ? modifier === 0 ? "0%" : `+${opt.costModifier}%`
+                                    : modifier === 0 ? "$0" : `+$${modifier.toLocaleString()}`}
+                                  {opt.modifierType === "per_sq_ft" && <span className="text-[10px] font-normal text-ink-300">/sqft</span>}
+                                </div>
+                                {labourCost !== null && labourCost > 0 && opt.modifierType === "per_sq_ft" && (
+                                  <div className="text-[11px] text-ink-300 tabular-nums mt-0.5">
+                                    ~${labourCost.toLocaleString()} total
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          </button>
+                        );
+                      })}
                     </div>
                   </div>
                 ))}
@@ -375,6 +546,14 @@ export default function EstimatePage() {
                 <label className="block text-sm font-semibold text-ink-700 mb-1.5">
                   Total Square Footage
                 </label>
+                {(() => {
+                  const bc = BEDROOM_CONFIGS.find((c) => c.id === selectedBedroom);
+                  return bc ? (
+                    <p className="text-xs text-ink-400 mb-2">
+                      Typical range for {bc.label.toLowerCase()}: {bc.minSqFt.toLocaleString()} – {bc.maxSqFt.toLocaleString()} sq ft
+                    </p>
+                  ) : null;
+                })()}
                 <input
                   type="number"
                   value={sqft}
@@ -439,18 +618,6 @@ export default function EstimatePage() {
                 />
               </div>
 
-              <label className="flex items-start gap-3 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={consent}
-                  onChange={(e) => setConsent(e.target.checked)}
-                  className="w-5 h-5 accent-ink-800 rounded mt-0.5"
-                />
-                <span className="text-sm text-ink-500 leading-relaxed">
-                  I agree to share my project details with verified local contractors to receive quotes.
-                </span>
-              </label>
-
               {error && (
                 <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-3 text-sm">
                   {error}
@@ -460,11 +627,90 @@ export default function EstimatePage() {
 
             <div className="flex justify-end mt-8">
               <button
-                disabled={!contactValue || !consent || sqft < 100 || submitting}
+                disabled={!contactValue || sqft < 100}
+                onClick={() => setStep("terms")}
+                className="px-8 py-3 rounded-lg font-bold bg-ink-800 text-cane-400 hover:bg-ink-900 transition disabled:opacity-30 disabled:cursor-not-allowed text-sm"
+              >
+                Continue
+              </button>
+            </div>
+          </section>
+        )}
+
+        {/* STEP 5: TERMS & CONDITIONS */}
+        {step === "terms" && (
+          <section>
+            <h1 className="text-2xl sm:text-3xl font-bold mb-2">Terms &amp; Conditions</h1>
+            <p className="text-ink-400 mb-6">
+              Please review and accept before we generate your estimate.
+            </p>
+
+            <div className="bg-white rounded-lg border border-ink-200/70 p-5 sm:p-6 mb-6 max-h-[400px] overflow-y-auto text-sm text-ink-600 space-y-4">
+              <h3 className="font-bold text-ink-800">1. Estimate Disclaimer</h3>
+              <p>
+                The estimate provided by IrieEstimate is for <strong>labour costs only</strong> and does not include material costs,
+                permit fees, professional fees, or any other expenses. All figures are approximate and based on standard
+                residential construction practices in Jamaica as of the current date. Actual costs may vary depending on
+                site conditions, contractor availability, market fluctuations, and project complexity.
+              </p>
+
+              <h3 className="font-bold text-ink-800">2. Not a Quote or Contract</h3>
+              <p>
+                This estimate does not constitute a quote, bid, or contract. It is intended for informational and planning
+                purposes only. We recommend obtaining formal quotes from licensed contractors and consulting a Quantity
+                Surveyor for a detailed Bill of Quantities before commencing any construction work.
+              </p>
+
+              <h3 className="font-bold text-ink-800">3. Use of Your Information</h3>
+              <p>
+                By submitting your contact details, you agree that IrieEstimate may store your project information and
+                contact details for the purpose of generating your estimate. If you consent to sharing with partners,
+                your details may be shared with verified local contractors and building suppliers who may contact you
+                with quotes and offers relevant to your project.
+              </p>
+
+              <h3 className="font-bold text-ink-800">4. Data Retention</h3>
+              <p>
+                Your estimate data is stored securely. Shared estimate links expire after 24 hours and are automatically
+                deleted from our database. You may request deletion of your data at any time by contacting us.
+              </p>
+
+              <h3 className="font-bold text-ink-800">5. Limitation of Liability</h3>
+              <p>
+                IrieEstimate, its owners, and affiliates shall not be held liable for any financial loss, project delay,
+                or damages arising from reliance on the estimates provided. Users accept full responsibility for all
+                construction and financial decisions made based on the information provided.
+              </p>
+
+              <h3 className="font-bold text-ink-800">6. Third-Party Content</h3>
+              <p>
+                Advertisements displayed on IrieEstimate are from third-party sponsors. We do not endorse or guarantee
+                the products or services advertised. Users engage with advertisers at their own discretion and risk.
+              </p>
+            </div>
+
+            <div className="bg-white rounded-lg border border-ink-200/70 p-5 sm:p-6 space-y-4">
+              <label className="flex items-start gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={consent}
+                  onChange={(e) => setConsent(e.target.checked)}
+                  className="w-5 h-5 accent-ink-800 rounded mt-0.5"
+                />
+                <span className="text-sm text-ink-600 leading-relaxed">
+                  I have read and agree to the Terms &amp; Conditions above, and I consent to share my
+                  project details with verified local contractors to receive quotes.
+                </span>
+              </label>
+            </div>
+
+            <div className="flex justify-end mt-8">
+              <button
+                disabled={!consent || submitting}
                 onClick={handleSubmit}
                 className="px-8 py-3 rounded-lg font-bold bg-ink-800 text-cane-400 hover:bg-ink-900 transition disabled:opacity-30 disabled:cursor-not-allowed text-sm"
               >
-                {submitting ? "Calculating..." : "Get My Estimate"}
+                {submitting ? "Calculating..." : "Agree & Get My Estimate"}
               </button>
             </div>
           </section>
@@ -522,6 +768,7 @@ export default function EstimatePage() {
             <div className="bg-ink-800 text-white rounded-lg p-6 sm:p-8 mb-6">
               <div className="text-center">
                 <div className="text-sm text-ink-300 mb-1">
+                  {BEDROOM_CONFIGS.find((c) => c.id === selectedBedroom)?.label ?? ""}{" "}
                   {result.houseType} &middot; {result.squareFootage.toLocaleString()} sq ft
                   {result.parishName && <> &middot; {result.parishName}</>}
                 </div>
@@ -660,9 +907,10 @@ export default function EstimatePage() {
               <button
                 onClick={() => {
                   resetAdTracking();
-                  setStep("tier");
+                  setStep("bedrooms");
                   setResult(null);
                   setLeadId("");
+                  setSelectedBedroom("");
                   setSelectedTier("");
                   setSelectedOptions({});
                   setSelectedParish("");
