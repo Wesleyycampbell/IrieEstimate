@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
+import { sanitizeHtml } from "@/lib/sanitize-html";
 
 interface AdData {
   id: string;
@@ -83,9 +84,9 @@ export default function AdSlot({ page, parishId, minH = "90px" }: { page: string
         {ad.targetUrl ? (
           <a href={ad.targetUrl} target="_blank" rel="noopener noreferrer sponsored" onClick={() => handleClick(ad)}
             className="block w-full"
-            dangerouslySetInnerHTML={{ __html: ad.content }} />
+            dangerouslySetInnerHTML={{ __html: sanitizeHtml(ad.content) }} />
         ) : (
-          <div className="w-full" dangerouslySetInnerHTML={{ __html: ad.content }} />
+          <div className="w-full" dangerouslySetInnerHTML={{ __html: sanitizeHtml(ad.content) }} />
         )}
         {ad.sponsorName && (
           <div className="text-[10px] text-ink-300 text-right px-2 py-1 bg-ink-50">Sponsored by {ad.sponsorName}</div>

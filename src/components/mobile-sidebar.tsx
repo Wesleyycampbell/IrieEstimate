@@ -15,8 +15,8 @@ export default function MobileSidebar({ navLinks, email, role }: Props) {
   return (
     <>
       {/* Mobile top bar */}
-      <div className="md:hidden fixed top-0 left-0 right-0 z-40 bg-ink-800 text-white h-14 flex items-center px-4 gap-3">
-        <button onClick={() => setOpen(!open)} className="w-8 h-8 flex items-center justify-center">
+      <div className="md:hidden fixed top-0 left-0 right-0 z-40 bg-ink-800 text-white h-[72px] flex items-center px-4 gap-3">
+        <button onClick={() => setOpen(!open)} className="w-11 h-11 flex items-center justify-center">
           <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             {open ? (
               <path strokeLinecap="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />

@@ -5,13 +5,7 @@ import { eq } from "drizzle-orm";
 import { z } from "zod";
 import { getSession } from "@/lib/workspace-auth";
 import { rateLimit } from "@/lib/rate-limit";
-
-const createSchema = z.object({
-  leadId: z.string().uuid(),
-  siteAddress: z.string().min(5, "Site address is required").max(500),
-  preferredDate: z.string().optional(),
-  notes: z.string().max(2000).optional(),
-});
+import { consultationSchema } from "@/lib/validations";
 
 export async function POST(req: NextRequest) {
   try {
@@ -25,7 +19,7 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const parsed = createSchema.safeParse(body);
+    const parsed = consultationSchema.safeParse(body);
 
     if (!parsed.success) {
       return NextResponse.json(

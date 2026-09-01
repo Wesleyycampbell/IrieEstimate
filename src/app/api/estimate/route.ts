@@ -13,6 +13,7 @@ import { eq, inArray, and } from "drizzle-orm";
 import { leadSchema } from "@/lib/validations";
 import { calculateEstimate } from "@/lib/calculate";
 import { rateLimit } from "@/lib/rate-limit";
+import crypto from "crypto";
 
 export async function POST(req: NextRequest) {
   try {
@@ -183,17 +184,30 @@ async function distributeLead(leadId: string, parishId: string | null) {
     if (!partner.webhookUrl || !isAllowedWebhookUrl(partner.webhookUrl)) continue;
 
     try {
+      const payload = JSON.stringify({
+        leadId: lead.id,
+        contact: lead.contactValue,
+        contactType: lead.contactType,
+        squareFootage: lead.totalSquareFootage,
+        estimatedCost: lead.finalEstimatedCost,
+        parish: parishName,
+      });
+      const webhookSecret = process.env.WEBHOOK_SECRET || "";
+      const timestamp = Math.floor(Date.now() / 1000).toString();
+      const signature = webhookSecret
+        ? crypto.createHmac("sha256", webhookSecret).update(`${timestamp}.${payload}`).digest("hex")
+        : "";
+
       const resp = await fetch(partner.webhookUrl, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          leadId: lead.id,
-          contact: lead.contactValue,
-          contactType: lead.contactType,
-          squareFootage: lead.totalSquareFootage,
-          estimatedCost: lead.finalEstimatedCost,
-          parish: parishName,
-        }),
+        headers: {
+          "Content-Type": "application/json",
+          ...(signature && {
+            "X-Webhook-Signature": signature,
+            "X-Webhook-Timestamp": timestamp,
+          }),
+        },
+        body: payload,
       });
 
       await db

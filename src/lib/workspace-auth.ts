@@ -65,6 +65,15 @@ export async function destroySession() {
   jar.delete(SESSION_COOKIE);
 }
 
+export function validatePasswordStrength(password: string): string | null {
+  if (password.length < 8) return "Password must be at least 8 characters";
+  if (!/[A-Z]/.test(password)) return "Password must contain an uppercase letter";
+  if (!/[a-z]/.test(password)) return "Password must contain a lowercase letter";
+  if (!/[0-9]/.test(password)) return "Password must contain a number";
+  if (!/[^A-Za-z0-9]/.test(password)) return "Password must contain a special character";
+  return null;
+}
+
 export async function hashPassword(password: string): Promise<string> {
   return new Promise((resolve, reject) => {
     const salt = crypto.randomBytes(16).toString("hex");

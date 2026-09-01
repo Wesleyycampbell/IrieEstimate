@@ -1,26 +1,58 @@
 import Link from "next/link";
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://irieestimate.com";
+
+const localBusinessSchema = {
+  "@context": "https://schema.org",
+  "@type": "ProfessionalService",
+  name: "IrieEstimate",
+  description:
+    "Free construction labour cost estimates for homeowners across Jamaica. Compare tiers, customise finishes, and connect with verified contractors.",
+  url: SITE_URL,
+  areaServed: {
+    "@type": "Country",
+    name: "Jamaica",
+  },
+  serviceType: "Construction Cost Estimation",
+  priceRange: "Free",
+  email: "hello@irieestimate.com",
+};
+
+const websiteSchema = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: "IrieEstimate",
+  url: SITE_URL,
+};
+
 export default function Home() {
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify([localBusinessSchema, websiteSchema]) }}
+      />
       <header className="sticky top-0 z-50 bg-white/80 backdrop-blur border-b border-ink-100">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
-          <div className="flex items-center gap-2 font-bold text-ink-800">
-            <span className="w-7 h-7 bg-ink-800 rounded-md flex items-center justify-center text-cane-400 text-[10px] font-bold">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 h-[72px] flex items-center justify-between">
+          <div className="flex items-center gap-2 font-bold text-ink-800 text-base">
+            <span className="w-8 h-8 bg-ink-800 rounded-md flex items-center justify-center text-cane-400 text-[11px] font-bold">
               IE
             </span>
             IrieEstimate
           </div>
-          <nav className="flex items-center gap-3 sm:gap-6 text-sm">
-            <a href="#how-it-works" className="hidden sm:inline text-ink-400 hover:text-ink-800 transition">
+          <nav className="flex items-center gap-4 sm:gap-6 text-base">
+            <a href="#how-it-works" className="hidden sm:inline py-2 text-ink-400 hover:text-ink-800 transition">
               How it works
             </a>
-            <Link href="/blog" className="hidden sm:inline text-ink-400 hover:text-ink-800 transition">
+            <Link href="/blog" className="hidden sm:inline py-2 text-ink-400 hover:text-ink-800 transition">
               Blog
+            </Link>
+            <Link href="/about" className="hidden sm:inline py-2 text-ink-400 hover:text-ink-800 transition">
+              About
             </Link>
             <Link
               href="/estimate"
-              className="px-4 py-2 bg-cane-400 text-ink-800 rounded-lg font-semibold text-sm hover:bg-cane-500 transition"
+              className="px-5 py-2.5 min-h-[44px] flex items-center bg-cane-400 text-ink-800 rounded-lg font-semibold text-base hover:bg-cane-500 transition"
             >
               Get Estimate
             </Link>
@@ -128,10 +160,13 @@ export default function Home() {
               </span>
               IrieEstimate
             </div>
-            <div className="flex items-center gap-4">
+            <nav className="flex items-center gap-4">
+              <Link href="/estimate" className="text-ink-300 hover:text-ink-500 transition">Estimate</Link>
+              <Link href="/blog" className="text-ink-300 hover:text-ink-500 transition">Blog</Link>
               <Link href="/about" className="text-ink-300 hover:text-ink-500 transition">About</Link>
-              <span className="text-ink-300">Jamaica &middot; 2026</span>
-            </div>
+              <Link href="/terms" className="text-ink-300 hover:text-ink-500 transition">Terms</Link>
+            </nav>
+            <span className="text-ink-300">Jamaica &middot; 2026</span>
           </div>
         </div>
       </footer>

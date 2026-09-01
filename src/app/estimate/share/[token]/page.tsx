@@ -150,16 +150,16 @@ export default function SharedEstimatePage() {
 function Header() {
   return (
     <header className="sticky top-0 z-50 bg-white/80 backdrop-blur border-b border-ink-100">
-      <div className="max-w-2xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-2 font-bold text-ink-800">
-          <span className="w-7 h-7 bg-ink-800 rounded-md flex items-center justify-center text-cane-400 text-[10px] font-bold">
+      <div className="max-w-2xl mx-auto px-4 sm:px-6 h-[72px] flex items-center justify-between">
+        <Link href="/" className="flex items-center gap-2 font-bold text-ink-800 text-base">
+          <span className="w-8 h-8 bg-ink-800 rounded-md flex items-center justify-center text-cane-400 text-[11px] font-bold">
             IE
           </span>
           IrieEstimate
         </Link>
         <Link
           href="/estimate"
-          className="px-4 py-2 bg-cane-400 text-ink-800 rounded-lg font-semibold text-sm hover:bg-cane-500 transition"
+          className="px-5 py-2.5 min-h-[44px] flex items-center bg-cane-400 text-ink-800 rounded-lg font-semibold text-base hover:bg-cane-500 transition"
         >
           Get Estimate
         </Link>

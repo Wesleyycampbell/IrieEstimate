@@ -1,23 +1,44 @@
+import type { Metadata } from "next";
 import Link from "next/link";
+
+export const metadata: Metadata = {
+  title: "About",
+  description:
+    "Learn how IrieEstimate provides free construction labour cost estimates for homeowners across all 14 parishes in Jamaica.",
+  alternates: { canonical: "/about" },
+};
+
+const breadcrumbSchema = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: "https://irieestimate.com/" },
+    { "@type": "ListItem", position: 2, name: "About" },
+  ],
+};
 
 export default function AboutPage() {
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+      />
       <header className="sticky top-0 z-50 bg-white/80 backdrop-blur border-b border-ink-100">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2 font-bold text-ink-800">
-            <span className="w-7 h-7 bg-ink-800 rounded-md flex items-center justify-center text-cane-400 text-[10px] font-bold">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 h-[72px] flex items-center justify-between">
+          <Link href="/" className="flex items-center gap-2 font-bold text-ink-800 text-base">
+            <span className="w-8 h-8 bg-ink-800 rounded-md flex items-center justify-center text-cane-400 text-[11px] font-bold">
               IE
             </span>
             IrieEstimate
           </Link>
-          <nav className="flex items-center gap-6 text-sm">
-            <Link href="/blog" className="text-ink-400 hover:text-ink-800 transition">
+          <nav className="flex items-center gap-4 sm:gap-6 text-base">
+            <Link href="/blog" className="py-2 text-ink-400 hover:text-ink-800 transition">
               Blog
             </Link>
             <Link
               href="/estimate"
-              className="px-4 py-2 bg-cane-400 text-ink-800 rounded-lg font-semibold text-sm hover:bg-cane-500 transition"
+              className="px-5 py-2.5 min-h-[44px] flex items-center bg-cane-400 text-ink-800 rounded-lg font-semibold text-base hover:bg-cane-500 transition"
             >
               Get Estimate
             </Link>
@@ -138,7 +159,13 @@ export default function AboutPage() {
               </span>
               IrieEstimate
             </div>
-            <div className="text-ink-300">Jamaica &middot; 2026</div>
+            <nav className="flex items-center gap-4">
+              <Link href="/estimate" className="text-ink-300 hover:text-ink-500 transition">Estimate</Link>
+              <Link href="/blog" className="text-ink-300 hover:text-ink-500 transition">Blog</Link>
+              <Link href="/about" className="text-ink-300 hover:text-ink-500 transition">About</Link>
+              <Link href="/terms" className="text-ink-300 hover:text-ink-500 transition">Terms</Link>
+            </nav>
+            <span className="text-ink-300">Jamaica &middot; 2026</span>
           </div>
         </div>
       </footer>

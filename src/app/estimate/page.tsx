@@ -87,7 +87,7 @@ const BEDROOM_CONFIGS: BedroomConfig[] = [
   },
 ];
 
-type Step = "bedrooms" | "tier" | "customize" | "contact" | "terms" | "results";
+type Step = "bedrooms" | "tier" | "customize" | "contact" | "results";
 
 const OPTION_TOOLTIPS: Record<string, string> = {
   "Lineout & Excavation (basic)": "Setting out the building lines and digging trenches for the foundation. Basic standard option.",
@@ -274,22 +274,21 @@ export default function EstimatePage() {
     );
   }
 
-  const stepIndex = step === "bedrooms" ? 0 : step === "tier" ? 1 : step === "customize" ? 2 : step === "contact" ? 3 : step === "terms" ? 4 : 5;
+  const stepIndex = step === "bedrooms" ? 0 : step === "tier" ? 1 : step === "customize" ? 2 : step === "contact" ? 3 : 4;
   const steps = [
     { label: "Size", done: stepIndex > 0 },
     { label: "Tier", done: stepIndex > 1 },
     { label: "Finishes", done: stepIndex > 2 },
     { label: "Details", done: stepIndex > 3 },
-    { label: "Terms", done: stepIndex > 4 },
-    { label: "Results", done: stepIndex > 5 },
+    { label: "Results", done: stepIndex > 4 },
   ];
 
   return (
     <>
       <header className="sticky top-0 z-50 bg-white/80 backdrop-blur border-b border-ink-100">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2 font-bold text-ink-800">
-            <span className="w-7 h-7 bg-ink-800 rounded-md flex items-center justify-center text-cane-400 text-[10px] font-bold">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 h-[72px] flex items-center justify-between">
+          <Link href="/" className="flex items-center gap-2 font-bold text-ink-800 text-base">
+            <span className="w-8 h-8 bg-ink-800 rounded-md flex items-center justify-center text-cane-400 text-[11px] font-bold">
               IE
             </span>
             IrieEstimate
@@ -300,9 +299,8 @@ export default function EstimatePage() {
                 if (step === "tier") setStep("bedrooms");
                 else if (step === "customize") setStep("tier");
                 else if (step === "contact") setStep("customize");
-                else if (step === "terms") setStep("contact");
               }}
-              className={`text-sm text-ink-400 hover:text-ink-600 transition ${step === "bedrooms" ? "invisible" : ""}`}
+              className={`text-base py-2 min-h-[44px] flex items-center text-ink-400 hover:text-ink-600 transition ${step === "bedrooms" ? "invisible" : ""}`}
             >
               Back
             </button>
@@ -623,90 +621,35 @@ export default function EstimatePage() {
                   {error}
                 </div>
               )}
+
+              <div className="border-t border-ink-200/70 pt-5">
+                <label className="flex items-start gap-3 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={consent}
+                    onChange={(e) => setConsent(e.target.checked)}
+                    className="w-5 h-5 accent-ink-800 rounded mt-0.5 shrink-0"
+                  />
+                  <span className="text-sm text-ink-600 leading-relaxed">
+                    I agree to the{" "}
+                    <a
+                      href="/terms"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-ink-800 font-semibold underline underline-offset-2 hover:text-cane-600 transition"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      Terms &amp; Conditions
+                    </a>{" "}
+                    and consent to share my project details with verified local contractors.
+                  </span>
+                </label>
+              </div>
             </div>
 
             <div className="flex justify-end mt-8">
               <button
-                disabled={!contactValue || sqft < 100}
-                onClick={() => setStep("terms")}
-                className="px-8 py-3 rounded-lg font-bold bg-ink-800 text-cane-400 hover:bg-ink-900 transition disabled:opacity-30 disabled:cursor-not-allowed text-sm"
-              >
-                Continue
-              </button>
-            </div>
-          </section>
-        )}
-
-        {/* STEP 5: TERMS & CONDITIONS */}
-        {step === "terms" && (
-          <section>
-            <h1 className="text-2xl sm:text-3xl font-bold mb-2">Terms &amp; Conditions</h1>
-            <p className="text-ink-400 mb-6">
-              Please review and accept before we generate your estimate.
-            </p>
-
-            <div className="bg-white rounded-lg border border-ink-200/70 p-5 sm:p-6 mb-6 max-h-[400px] overflow-y-auto text-sm text-ink-600 space-y-4">
-              <h3 className="font-bold text-ink-800">1. Estimate Disclaimer</h3>
-              <p>
-                The estimate provided by IrieEstimate is for <strong>labour costs only</strong> and does not include material costs,
-                permit fees, professional fees, or any other expenses. All figures are approximate and based on standard
-                residential construction practices in Jamaica as of the current date. Actual costs may vary depending on
-                site conditions, contractor availability, market fluctuations, and project complexity.
-              </p>
-
-              <h3 className="font-bold text-ink-800">2. Not a Quote or Contract</h3>
-              <p>
-                This estimate does not constitute a quote, bid, or contract. It is intended for informational and planning
-                purposes only. We recommend obtaining formal quotes from licensed contractors and consulting a Quantity
-                Surveyor for a detailed Bill of Quantities before commencing any construction work.
-              </p>
-
-              <h3 className="font-bold text-ink-800">3. Use of Your Information</h3>
-              <p>
-                By submitting your contact details, you agree that IrieEstimate may store your project information and
-                contact details for the purpose of generating your estimate. If you consent to sharing with partners,
-                your details may be shared with verified local contractors and building suppliers who may contact you
-                with quotes and offers relevant to your project.
-              </p>
-
-              <h3 className="font-bold text-ink-800">4. Data Retention</h3>
-              <p>
-                Your estimate data is stored securely. Shared estimate links expire after 24 hours and are automatically
-                deleted from our database. You may request deletion of your data at any time by contacting us.
-              </p>
-
-              <h3 className="font-bold text-ink-800">5. Limitation of Liability</h3>
-              <p>
-                IrieEstimate, its owners, and affiliates shall not be held liable for any financial loss, project delay,
-                or damages arising from reliance on the estimates provided. Users accept full responsibility for all
-                construction and financial decisions made based on the information provided.
-              </p>
-
-              <h3 className="font-bold text-ink-800">6. Third-Party Content</h3>
-              <p>
-                Advertisements displayed on IrieEstimate are from third-party sponsors. We do not endorse or guarantee
-                the products or services advertised. Users engage with advertisers at their own discretion and risk.
-              </p>
-            </div>
-
-            <div className="bg-white rounded-lg border border-ink-200/70 p-5 sm:p-6 space-y-4">
-              <label className="flex items-start gap-3 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={consent}
-                  onChange={(e) => setConsent(e.target.checked)}
-                  className="w-5 h-5 accent-ink-800 rounded mt-0.5"
-                />
-                <span className="text-sm text-ink-600 leading-relaxed">
-                  I have read and agree to the Terms &amp; Conditions above, and I consent to share my
-                  project details with verified local contractors to receive quotes.
-                </span>
-              </label>
-            </div>
-
-            <div className="flex justify-end mt-8">
-              <button
-                disabled={!consent || submitting}
+                disabled={!contactValue || sqft < 100 || !consent || submitting}
                 onClick={handleSubmit}
                 className="px-8 py-3 rounded-lg font-bold bg-ink-800 text-cane-400 hover:bg-ink-900 transition disabled:opacity-30 disabled:cursor-not-allowed text-sm"
               >
@@ -716,7 +659,7 @@ export default function EstimatePage() {
           </section>
         )}
 
-        {/* STEP 4: RESULTS */}
+        {/* STEP 5: RESULTS */}
         {step === "results" && result && (() => {
           const perSqFt = Math.round(result.totalCost / result.squareFootage);
           return (

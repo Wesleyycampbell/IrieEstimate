@@ -33,9 +33,15 @@ export const metadata: Metadata = {
     description:
       "Free construction labour cost estimates for Jamaica. Compare tiers, customise finishes, get a detailed breakdown.",
   },
+  alternates: {
+    canonical: "/",
+  },
   robots: {
     index: true,
     follow: true,
+  },
+  icons: {
+    icon: "/icon.svg",
   },
 };
 

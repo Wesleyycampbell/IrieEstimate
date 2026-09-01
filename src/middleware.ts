@@ -43,10 +43,16 @@ async function verifyToken(token: string): Promise<string | null> {
   return payload;
 }
 
-// In-memory rate limiter for Edge Runtime
 const apiHits = new Map<string, { count: number; resetAt: number }>();
 const API_RATE_LIMIT = 60;
 const API_WINDOW_MS = 60_000;
+
+setInterval(() => {
+  const now = Date.now();
+  for (const [key, entry] of apiHits) {
+    if (now > entry.resetAt) apiHits.delete(key);
+  }
+}, 60_000);
 
 function checkApiRateLimit(ip: string): boolean {
   const now = Date.now();
@@ -59,11 +65,10 @@ function checkApiRateLimit(ip: string): boolean {
   return entry.count <= API_RATE_LIMIT;
 }
 
-export async function proxy(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
 
-  // Rate limit all API routes
   if (pathname.startsWith("/api/")) {
     if (!checkApiRateLimit(ip)) {
       return NextResponse.json(
@@ -72,7 +77,6 @@ export async function proxy(request: NextRequest) {
       );
     }
 
-    // Block non-GET API requests without a valid origin/referer (CSRF protection)
     if (request.method !== "GET") {
       const origin = request.headers.get("origin");
       const referer = request.headers.get("referer");
@@ -100,7 +104,6 @@ export async function proxy(request: NextRequest) {
     }
   }
 
-  // Auth check for workspace routes
   if (pathname.startsWith("/hq-workspace") && !pathname.startsWith("/hq-workspace/login")) {
     const token = request.cookies.get(SESSION_COOKIE)?.value;
 

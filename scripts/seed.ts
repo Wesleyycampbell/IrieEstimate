@@ -62,7 +62,11 @@ async function seed() {
   }
 
   console.log("Creating workspace admin user...");
-  const hash = await hashPassword("admin123");
+  const seedPassword = process.env.ADMIN_PASSWORD;
+  if (!seedPassword || seedPassword.length < 8) {
+    throw new Error("ADMIN_PASSWORD env var must be set and at least 8 characters");
+  }
+  const hash = await hashPassword(seedPassword);
   await db.insert(schema.workspaceUsers).values({
     email: "admin@irieestimate.com",
     passwordHash: hash,
