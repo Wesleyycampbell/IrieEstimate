@@ -3,6 +3,9 @@ import { getSession } from "@/lib/workspace-auth";
 import { redirect } from "next/navigation";
 import MobileSidebar from "@/components/mobile-sidebar";
 
+// Authenticated per-request admin area — never prerender at build time.
+export const dynamic = "force-dynamic";
+
 export default async function WorkspaceLayout({
   children,
 }: {

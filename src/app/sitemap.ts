@@ -3,14 +3,22 @@ import { db } from "@/db";
 import { blogPosts } from "@/db/schema";
 import { eq, desc } from "drizzle-orm";
 
+// Generated per request so it does not need a DB connection at build time.
+export const dynamic = "force-dynamic";
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://irieestimate.com";
 
-  const posts = await db
-    .select({ slug: blogPosts.slug, publishedAt: blogPosts.publishedAt })
-    .from(blogPosts)
-    .where(eq(blogPosts.isPublished, true))
-    .orderBy(desc(blogPosts.publishedAt));
+  let posts: { slug: string; publishedAt: Date | null }[] = [];
+  try {
+    posts = await db
+      .select({ slug: blogPosts.slug, publishedAt: blogPosts.publishedAt })
+      .from(blogPosts)
+      .where(eq(blogPosts.isPublished, true))
+      .orderBy(desc(blogPosts.publishedAt));
+  } catch {
+    // DB unavailable — fall back to the static routes below.
+  }
 
   const blogEntries = posts.map((post) => ({
     url: `${siteUrl}/blog/${post.slug}`,
