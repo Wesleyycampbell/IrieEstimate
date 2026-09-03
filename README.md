@@ -10,7 +10,6 @@ Construction labour cost estimator for Jamaica. Homeowners choose a build tier, 
 - **ORM** — Drizzle ORM with postgres.js driver
 - **Styling** — Tailwind CSS v4 with custom `ink` / `cane` colour tokens
 - **Auth** — HMAC-signed cookie sessions (workspace only)
-- **Email** — Resend
 - **Validation** — Zod
 
 ## Features
